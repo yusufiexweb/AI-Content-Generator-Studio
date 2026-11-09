@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b1f">
+  <meta name="description" content="AI Studio — generate blog posts, social content, ad copy, video scripts and emails in seconds. Save 75% of your time and ship 200% more content.">
+  <title>AI Studio — AI Content Generator</title>
+  <style>
+    :root {
+      --bg: #070b1f;
+      --bg-2: #0c1230;
+      --surface: rgba(255,255,255,.045);
+      --surface-2: rgba(255,255,255,.08);
+      --line: rgba(130,160,255,.18);
+      --ink: #eef2ff;
+      --muted: #9aa6d0;
+      --blue: #4d8dff;
+      --cyan: #3de0ff;
+      --violet: #8b6cff;
+      --green: #38d9a0;
+      --grad: linear-gradient(120deg, #4d8dff, #3de0ff 55%, #8b6cff);
+      --radius: 18px;
+      --shadow: 0 24px 60px rgba(0,0,0,.4);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(900px 500px at 80% -10%, rgba(77,141,255,.22), transparent 60%),
+        radial-gradient(700px 500px at -10% 30%, rgba(139,108,255,.14), transparent 60%),
+        var(--bg);
+      color: var(--ink);
+      font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 3px solid rgba(61,224,255,.55); outline-offset: 3px; border-radius: 8px; }
+    .container { width: min(1160px, 100% - 40px); margin-inline: auto; }
+    section { padding: 96px 0; }
+    .eyebrow { display: inline-block; margin-bottom: 14px; color: var(--cyan); font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3 { margin: 0; line-height: 1.15; letter-spacing: -.02em; }
+    h2 { font-size: clamp(28px, 4vw, 44px); }
+    .section-head { max-width: 660px; margin-bottom: 48px; }
+    .section-head p { margin: 14px 0 0; color: var(--muted); font-size: 17px; }
+    .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 24px; border: 1px solid var(--line); border-radius: 12px;
+      background: var(--surface); font-weight: 650; transition: transform .18s, box-shadow .18s, background .18s;
+    }
+    .btn:hover { transform: translateY(-2px); background: var(--surface-2); }
+    .btn.primary { border: 0; background: var(--grad); color: #04102b; box-shadow: 0 10px 30px rgba(77,141,255,.35); }
+    .btn.primary:hover { box-shadow: 0 14px 38px rgba(61,224,255,.4); }
+    .btn.small { padding: 9px 16px; font-size: 14px; border-radius: 10px; }
+
+    /* Header */
+    header.nav {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(16px); background: rgba(7,11,31,.72); border-bottom: 1px solid var(--line);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 20px; }
+    .logo { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .logo-sub { padding-left: 12px; border-left: 1px solid var(--line); color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .16em; line-height: 1.25; text-transform: uppercase; white-space: nowrap; }
+
+    /* Brand mark: icon + NOVA333X */
+    .brand-mark { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 11px; background: var(--grad); color: #04102b; box-shadow: 0 6px 18px rgba(77,141,255,.4); transition: box-shadow .25s, transform .25s; }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .brand-name { font-size: 18px; font-weight: 800; letter-spacing: .08em; white-space: nowrap; }
+    .logo:hover .brand-mark { box-shadow: 0 8px 24px rgba(61,224,255,.6); transform: translateY(-1px); }
+
+    .nav-links { display: flex; align-items: center; gap: 28px; color: var(--muted); font-size: 15px; font-weight: 550; }
+    .nav-links a { position: relative; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--ink); }
+    .nav-links a.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px; border-radius: 2px; background: var(--grad); }
+    .nav-links .nav-mobile-cta { display: none; }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .menu-btn { display: none; width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+
+    /* Hero */
+    .hero { padding: 72px 0 40px; }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 13px; }
+    .pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+    .hero h1 { margin: 20px 0; font-size: clamp(36px, 5.4vw, 62px); }
+    .hero p.lead { max-width: 540px; margin: 0 0 30px; color: var(--muted); font-size: 18px; }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 14px; }
+    .hero-stats { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 40px; }
+    .stat { min-width: 140px; padding: 16px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    .stat b { display: block; font-size: 30px; line-height: 1.1; }
+    .stat > span { color: var(--muted); font-size: 13px; }
+    .hero-art { position: relative; }
+    .hero-art::before { content: ""; position: absolute; inset: 8% 6%; border-radius: 50%; background: radial-gradient(circle, rgba(77,141,255,.55), transparent 70%); filter: blur(50px); }
+    .hero-art img { position: relative; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow); animation: float 7s ease-in-out infinite; }
+    @keyframes float { 50% { transform: translateY(-10px); } }
+
+    .logos { padding: 20px 0 0; text-align: center; color: var(--muted); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+    .logos div { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 40px; margin-top: 16px; font-size: 17px; font-weight: 750; letter-spacing: .02em; text-transform: none; opacity: .55; }
+
+    /* Generator */
+    .studio { display: grid; grid-template-columns: 380px 1fr; border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); box-shadow: var(--shadow); overflow: hidden; }
+    .studio-form { padding: 28px; border-right: 1px solid var(--line); display: grid; gap: 18px; align-content: start; }
+    .field label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; font-weight: 650; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(5,9,28,.7); outline: none;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(77,141,255,.2); }
+    .field select option { background: #0c1230; }
+    .field textarea { min-height: 84px; resize: vertical; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font-size: 14px; transition: .15s; }
+    .chip:hover { color: var(--ink); }
+    .chip[aria-pressed="true"] { border-color: transparent; background: var(--grad); color: #04102b; font-weight: 700; }
+    .studio-out { display: flex; flex-direction: column; min-height: 460px; }
+    .out-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 22px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    .out-bar .dots { display: flex; gap: 6px; }
+    .out-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.18); }
+    .out-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .out-body { flex: 1; padding: 26px; overflow: auto; max-height: 560px; white-space: pre-wrap; font-size: 15.5px; line-height: 1.75; }
+    .out-body.empty { display: grid; place-items: center; color: var(--muted); text-align: center; white-space: pre-line; }
+    .out-body.typing::after { content: "▍"; margin-left: 2px; color: var(--cyan); animation: blink 1s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .out-meta { display: flex; flex-wrap: wrap; gap: 18px; padding: 12px 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .out-meta b { color: var(--ink); }
+    .score { color: var(--green) !important; }
+
+    /* Features */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card { padding: 28px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); transition: transform .2s, border-color .2s, background .2s; }
+    .card:hover { transform: translateY(-4px); border-color: rgba(77,141,255,.5); background: var(--surface-2); }
+    .card .ico { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 18px; border-radius: 13px; background: rgba(77,141,255,.15); color: var(--cyan); font-size: 22px; }
+    .card .thumb { aspect-ratio: 16 / 10; margin: -28px -28px 22px; overflow: hidden; border-radius: var(--radius) var(--radius) 0 0; border-bottom: 1px solid var(--line); }
+    .card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+    .card:hover .thumb img { transform: scale(1.06); }
+    .card h3 { margin-bottom: 8px; font-size: 20px; }
+    .more { display: inline-block; margin-top: 14px; color: var(--cyan); font-size: 14px; font-weight: 650; }
+
+    /* Clickable info items + modal */
+    [data-info] { cursor: pointer; }
+    [data-info]:focus-visible { outline: 3px solid rgba(61,224,255,.6); outline-offset: 3px; }
+    .modal { width: min(760px, calc(100% - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 0; border: 1px solid var(--line); border-radius: 24px; background: #0b1130; color: var(--ink); box-shadow: 0 40px 100px rgba(0,0,0,.65), 0 0 0 1px rgba(77,141,255,.15); overflow: auto; }
+    .modal[open] { animation: pop .25s ease; }
+    .modal::backdrop { background: rgba(3,6,20,.78); backdrop-filter: blur(6px); }
+    @keyframes pop { from { opacity: 0; transform: translateY(16px) scale(.97); } }
+    .modal-close { position: absolute; top: 14px; right: 14px; z-index: 2; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; background: rgba(7,11,31,.75); backdrop-filter: blur(6px); font-size: 20px; line-height: 1; }
+    .modal-close:hover { background: var(--surface-2); }
+    .modal-media { aspect-ratio: 16 / 8; max-height: 38dvh; background: var(--bg-2); }
+    .modal-media img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-media[hidden] { display: none; }
+    .modal-content { padding: 28px 32px 32px; }
+    .modal-content .eyebrow { margin-bottom: 8px; }
+    .modal-content h3 { font-size: clamp(24px, 3.4vw, 32px); }
+    .modal-content p { margin: 14px 0 0; color: var(--muted); font-size: 16px; }
+    .modal-content ul { display: grid; gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; }
+    .modal-content li { padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font-size: 15px; }
+    .modal-content li::before { content: "✓"; margin-right: 10px; color: var(--green); font-weight: 800; }
+    .modal-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+    /* Workflow */
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: s; }
+    .step { position: relative; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); counter-increment: s; }
+    .step::before { content: "0" counter(s); display: block; margin-bottom: 14px; font-size: 38px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .step h3 { margin-bottom: 8px; font-size: 18px; }
+    .step p { margin: 0; color: var(--muted); font-size: 14.5px; }
+
+    /* Gallery */
+    .gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .tile { position: relative; min-height: 240px; padding: 20px; display: flex; flex-direction: column; justify-content: flex-end; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .tile > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+    .tile:hover > img { transform: scale(1.07); }
+    .tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(5,8,24,.9)); }
+    .tile > * { position: relative; z-index: 1; }
+    .tile h3 { font-size: 17px; }
+    .tile span { color: #c9d3ff; font-size: 13px; }
+    .tile.wide { grid-column: span 2; }
+
+    /* Pricing */
+    .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+    .plan { display: flex; flex-direction: column; padding: 32px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); }
+    .plan.featured { position: relative; border-color: transparent; background: linear-gradient(var(--bg-2), var(--bg-2)) padding-box, var(--grad) border-box; border: 1.5px solid transparent; box-shadow: 0 20px 60px rgba(77,141,255,.25); }
+    .plan .tag { position: absolute; top: -13px; left: 28px; padding: 4px 12px; border-radius: 999px; background: var(--grad); color: #04102b; font-size: 12px; font-weight: 800; }
+    .plan h3 { font-size: 20px; }
+    .price { margin: 14px 0 6px; font-size: 44px; font-weight: 800; }
+    .price small { color: var(--muted); font-size: 15px; font-weight: 500; }
+    .plan > p { margin: 0 0 20px; color: var(--muted); font-size: 14.5px; }
+    .plan ul { flex: 1; margin: 0 0 26px; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 15px; }
+    .plan li::before { content: "✓"; margin-right: 10px; color: var(--green); font-weight: 800; }
+    .billing { display: inline-flex; margin-bottom: 36px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+    .billing button { padding: 8px 20px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 650; }
+    .billing button[aria-pressed="true"] { background: var(--grad); color: #04102b; }
+
+    /* Testimonials / FAQ */
+    .quote { font-size: 16px; }
+    .who { display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+    .avatar { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: var(--grad); color: #04102b; font-weight: 800; }
+    .who small { display: block; color: var(--muted); }
+    .faq { max-width: 780px; margin-inline: auto; display: grid; gap: 12px; }
+    details { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    summary { padding: 18px 22px; font-weight: 650; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--cyan); font-size: 22px; line-height: 1; transition: transform .2s; }
+    details[open] summary::after { transform: rotate(45deg); }
+    details p { margin: 0; padding: 0 22px 20px; color: var(--muted); }
+
+    .cta { padding: 56px 40px; text-align: center; border: 1px solid var(--line); border-radius: 28px; background: radial-gradient(600px 260px at 50% 0%, rgba(77,141,255,.3), transparent 70%), var(--surface); }
+    .cta p { max-width: 540px; margin: 14px auto 28px; color: var(--muted); }
+    .cta form { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .cta input { width: min(320px, 100%); padding: 13px 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(5,9,28,.7); outline: none; }
+    .cta input:focus { border-color: var(--blue); }
+    .form-msg { min-height: 24px; margin-top: 14px; color: var(--green); font-size: 14px; }
+
+    footer { padding: 40px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; }
+    .foot nav { display: flex; gap: 22px; }
+    .foot nav a:hover { color: var(--ink); }
+    .socials { display: flex; gap: 10px; }
+    .socials a { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--ink); transition: transform .2s, background .2s, border-color .2s, color .2s; }
+    .socials a:hover { transform: translateY(-3px); border-color: var(--cyan); background: var(--surface-2); color: var(--cyan); }
+    .socials svg { width: 19px; height: 19px; fill: currentColor; }
+
+    .to-top { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 46px; height: 46px; border: 1px solid var(--line); border-radius: 50%; background: rgba(12,18,48,.9); backdrop-filter: blur(8px); box-shadow: var(--shadow); font-size: 18px; opacity: 0; pointer-events: none; transform: translateY(12px); transition: opacity .25s, transform .25s, background .2s; }
+    .to-top.show { opacity: 1; pointer-events: auto; transform: none; }
+    .to-top:hover { background: var(--surface-2); }
+
+    /* Preloader */
+    #preloader { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; padding: 24px; background: radial-gradient(700px 420px at 50% 40%, rgba(77,141,255,.2), transparent 70%), #050816; transition: opacity .7s ease, transform .7s ease, filter .7s ease, visibility .7s; animation: plFailsafe .6s 8s forwards; }
+    #preloader.pl-done { opacity: 0; visibility: hidden; transform: scale(1.06); filter: blur(8px); }
+    @keyframes plFailsafe { to { opacity: 0; visibility: hidden; } }
+    .pl-orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .5; animation: orb 9s ease-in-out infinite alternate; }
+    .pl-orb.a { width: 340px; height: 340px; left: 12%; top: 18%; background: #3b6bff; }
+    .pl-orb.b { width: 300px; height: 300px; right: 10%; bottom: 12%; background: #8b6cff; animation-delay: -4s; }
+    @keyframes orb { to { transform: translate(40px, -30px) scale(1.15); } }
+    .pl-card { position: relative; width: min(420px, 100%); padding: 34px 30px 28px; border: 1px solid var(--line); border-radius: 24px; background: rgba(12,18,48,.72); backdrop-filter: blur(14px); box-shadow: 0 30px 80px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.03); text-align: center; }
+    .pl-card::before { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: 25px; background: conic-gradient(from 0deg, transparent 0 60%, var(--cyan), var(--violet), transparent); animation: spin 3.2s linear infinite; filter: blur(8px); opacity: .55; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pl-brand { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 auto 24px; animation: plLogo 1s ease both; }
+    .pl-brand .brand-mark { width: 54px; height: 54px; border-radius: 15px; box-shadow: 0 0 26px rgba(77,141,255,.65); animation: plPulse 2s ease-in-out infinite; }
+    .pl-brand .brand-mark svg { width: 31px; height: 31px; }
+    .pl-brand .brand-name { font-size: 28px; }
+    @keyframes plPulse { 50% { box-shadow: 0 0 40px rgba(61,224,255,.85); transform: scale(1.06); } }
+    @keyframes plLogo { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+    .pl-lines { display: grid; gap: 9px; margin: 0 auto 22px; text-align: left; }
+    .pl-lines i { display: block; height: 9px; border-radius: 6px; background: linear-gradient(90deg, rgba(77,141,255,.55), rgba(61,224,255,.25)); transform-origin: left; transform: scaleX(0); animation: write 2.4s ease-in-out infinite; }
+    .pl-lines i:nth-child(1) { width: 100%; }
+    .pl-lines i:nth-child(2) { width: 82%; animation-delay: .25s; }
+    .pl-lines i:nth-child(3) { width: 58%; animation-delay: .5s; }
+    @keyframes write { 0% { transform: scaleX(0); } 45%, 80% { transform: scaleX(1); } 100% { transform: scaleX(1); opacity: 0; } }
+    .pl-bar { height: 5px; border-radius: 5px; background: rgba(255,255,255,.08); overflow: hidden; }
+    .pl-bar b { display: block; width: 0; height: 100%; border-radius: 5px; background: var(--grad); box-shadow: 0 0 14px rgba(61,224,255,.7); transition: width .15s linear; }
+    .pl-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 12px; letter-spacing: .06em; }
+    .pl-meta span:first-child::after { content: "▍"; margin-left: 3px; color: var(--cyan); animation: blink 1s steps(2) infinite; }
+    #plPct { color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 700; }
+
+    /* Button functionality */
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn.loading { pointer-events: auto; }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(4,16,43,.3); border-top-color: #04102b; border-radius: 50%; animation: spin .7s linear infinite; }
+    .flash { animation: flash 1.2s ease; }
+    @keyframes flash { 0%, 100% { box-shadow: none; } 30% { box-shadow: 0 0 0 3px rgba(61,224,255,.6), 0 0 40px rgba(61,224,255,.35); } }
+    .examples { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip.ex { border-style: dashed; font-size: 13px; padding: 6px 12px; }
+    .history { display: grid; gap: 6px; }
+    .history-head { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 13px; font-weight: 650; }
+    .history-head button { border: 0; background: none; color: var(--cyan); font-size: 12px; padding: 0; }
+    .history button.h-item { display: block; width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history button.h-item:hover { color: var(--ink); background: var(--surface); }
+    .history[hidden] { display: none; }
+    .modal-nav { display: flex; gap: 8px; margin-left: auto; }
+    .modal-nav .btn { padding: 13px 16px; }
+    .modal.sm { width: min(520px, calc(100% - 32px)); }
+    .modal-form { display: grid; gap: 14px; margin-top: 20px; }
+    .form-error { min-height: 20px; color: #ff8a9b; font-size: 13.5px; }
+    .done-ico { width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 18px; border-radius: 50%; background: rgba(56,217,160,.15); color: var(--green); font-size: 30px; }
+
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s, transform .6s; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; z-index: 100; padding: 12px 20px; border: 1px solid var(--line); border-radius: 12px; background: #131b45; box-shadow: var(--shadow); transform: translate(-50%, 90px); transition: transform .3s; }
+    .toast.show { transform: translate(-50%, 0); }
+
+    @media (max-width: 1000px) {
+      .hero-grid, .studio { grid-template-columns: 1fr; }
+      .studio-form { border-right: 0; border-bottom: 1px solid var(--line); }
+      .grid-3, .pricing { grid-template-columns: 1fr 1fr; }
+      .steps, .gallery { grid-template-columns: 1fr 1fr; }
+      .tile.wide { grid-column: auto; }
+    }
+    @media (max-width: 760px) {
+      section { padding: 68px 0; }
+      .menu-btn { display: block; }
+      .nav-links { position: absolute; top: 68px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 8px 20px 16px; background: #0a1030; border-bottom: 1px solid var(--line); display: none; }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 12px 0; }
+      .nav-links a.active::after { display: none; }
+      .nav-links .nav-mobile-cta { display: block; margin-top: 8px; }
+      .nav-actions .btn { display: none; }
+      .logo-sub { display: none; }
+      .to-top { right: 14px; bottom: 14px; }
+      .foot { justify-content: center; text-align: center; }
+      .modal-nav { width: 100%; margin: 0; }
+      .modal-nav .btn { flex: 1; }
+      .grid-3, .pricing, .steps, .gallery { grid-template-columns: 1fr; }
+      .tile.wide { grid-column: auto; }
+      .cta { padding: 40px 22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="preloader" role="status" aria-live="polite" aria-label="Loading NOVA333X AI Studio">
+  <span class="pl-orb a"></span><span class="pl-orb b"></span>
+  <div class="pl-card">
+    <div class="pl-brand" aria-hidden="true">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 11h5M3 16h8"/><path d="M17 4l1.4 3.6L22 9l-3.6 1.4L17 14l-1.4-3.6L12 9l3.6-1.4z" fill="currentColor" stroke="none"/></svg>
+      </span>
+      <span class="brand-name">NOVA333X</span>
+    </div>
+    <div class="pl-lines" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="pl-bar" aria-hidden="true"><b id="plBar"></b></div>
+    <div class="pl-meta"><span id="plStatus">Warming up AI models…</span><span id="plPct">0%</span></div>
+  </div>
+</div>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="#top" class="logo" aria-label="NOVA333X AI Studio — back to top">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h8M3 11h5M3 16h8"/><path d="M17 4l1.4 3.6L22 9l-3.6 1.4L17 14l-1.4-3.6L12 9l3.6-1.4z" fill="currentColor" stroke="none"/></svg>
+      </span>
+      <span class="brand-name">NOVA333X</span>
+      <span class="logo-sub">AI Content<br>Studio</span>
+    </a>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="#studio">Generator</a>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#templates">Templates</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <button class="btn primary nav-mobile-cta" type="button" data-action="trial">Try it free</button>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn primary small" type="button" id="navCta" data-action="trial">Try it free</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="pill"><i></i> New · AI Studio 2025 is live</span>
+        <h1>How <span class="grad">AI Studio</span> is revolutionizing content creation</h1>
+        <p class="lead">Generate blog posts, social media content, ad copy, video scripts and emails in seconds — in your brand voice, ready to publish.</p>
+        <div class="hero-cta">
+          <button class="btn primary" type="button" data-action="start">Start generating</button>
+          <button class="btn" type="button" data-action="how">See how it works</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat" data-info="stat-time"><b><span data-count="75">0</span>%</b><span>Time saved</span></div>
+            <div class="stat" data-info="stat-output"><b>+<span data-count="200">0</span>%</b><span>Content output</span></div>
+            <div class="stat" data-info="stat-quality"><b><span data-count="92">0</span>%</b><span>Quality score</span></div>
+        </div>
+      </div>
+      <div class="hero-art">
+        <img src="https://media.easy-peasy.ai/0ccdb768-d579-469c-ba6c-d9d4dc9e3875/2fd1ee91-c108-4336-b4e0-1cb541d3a619.png" alt="Creator studio with a curved monitor running an AI content generator and a glowing holographic sphere" width="1024" height="1024" data-info="hero">
+      </div>
+    </div>
+  </section>
+
+  <div class="logos container">
+    Trusted by fast-moving content teams
+    <div><span>Lumina</span><span>Northwind</span><span>Orbitly</span><span>Kairo</span><span>Vantage</span></div>
+  </div>
+
+  <section id="studio">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Live demo</span>
+        <h2>Create content in <span class="grad">one click</span></h2>
+        <p>Pick a format, set the tone, describe your topic — AI Studio drafts it instantly. This demo runs fully in your browser.</p>
+      </div>
+
+      <div class="studio reveal">
+        <form class="studio-form" id="genForm" autocomplete="off">
+          <div class="field">
+            <label id="typeLabel">Content type</label>
+            <div class="chips" id="typeChips" role="group" aria-labelledby="typeLabel">
+              <button type="button" class="chip" data-type="blog" aria-pressed="true">Blog post</button>
+              <button type="button" class="chip" data-type="social" aria-pressed="false">Social post</button>
+              <button type="button" class="chip" data-type="ad" aria-pressed="false">Ad copy</button>
+              <button type="button" class="chip" data-type="video" aria-pressed="false">Video script</button>
+              <button type="button" class="chip" data-type="email" aria-pressed="false">Email</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="topic">Topic or product</label>
+            <input id="topic" type="text" maxlength="80" placeholder="e.g. Eco-friendly smart water bottle" required>
+          </div>
+          <div class="field">
+            <label for="audience">Target audience</label>
+            <input id="audience" type="text" maxlength="60" placeholder="e.g. busy young professionals">
+          </div>
+          <div class="field">
+            <label for="tone">Tone of voice</label>
+            <select id="tone">
+              <option value="professional">Professional</option>
+              <option value="friendly">Friendly</option>
+              <option value="bold">Bold &amp; energetic</option>
+              <option value="luxury">Luxury</option>
+            </select>
+          </div>
+          <button class="btn primary" type="submit" id="genBtn">✦ Generate content</button>
+          <div class="field">
+            <label id="exLabel">Quick examples</label>
+            <div class="examples" id="exChips" role="group" aria-labelledby="exLabel"></div>
+          </div>
+          <div class="history" id="history" hidden>
+            <div class="history-head"><span>Recent</span><button type="button" id="histClear">Clear</button></div>
+            <div id="histList" class="history"></div>
+          </div>
+        </form>
+
+        <div class="studio-out">
+          <div class="out-bar">
+            <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span id="outTitle">Output</span>
+            <div class="out-actions">
+              <button class="btn small" id="regenBtn" type="button" disabled>↻ Regenerate</button>
+              <button class="btn small" id="copyBtn" type="button" disabled>⧉ Copy</button>
+              <button class="btn small" id="dlBtn" type="button" disabled>⭳ Download</button>
+              <button class="btn small" id="clearBtn" type="button" disabled>✕ Clear</button>
+            </div>
+          </div>
+          <div class="out-body empty" id="outBody" aria-live="polite">Your generated content will appear here.
+Fill in a topic and press “Generate content”.</div>
+          <div class="out-meta">
+            <span>Words: <b id="mWords">0</b></span>
+            <span>Reading time: <b id="mRead">0 min</b></span>
+            <span>Quality score: <b class="score" id="mScore">—</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Features</span>
+        <h2>Everything you need to <span class="grad">create faster</span></h2>
+        <p>One workspace for ideation, writing, visuals and scheduling — powered by AI that learns your brand.</p>
+      </div>
+      <div class="grid-3">
+        <article class="card reveal" data-info="text"><div class="thumb"><img src="https://itservices1mb.com/img/gen/svc-2-960.webp" alt="Holographic text editor generating content" loading="lazy"></div><h3>Smart text generation</h3><p>Long-form articles, captions, ads and emails drafted in seconds with consistent structure and style.</p><span class="more">Learn more →</span></article>
+        <article class="card reveal" data-info="video"><div class="thumb"><img src="https://overseeros-renders.s3.eu-north-1.amazonaws.com/blog-images/7358371e-d336-47ea-8c9a-50e601973507/1793007659236-a1dd78c09c4e.webp" alt="Multi-track video editing timeline" loading="lazy"></div><h3>Timeline video editor</h3><p>Turn scripts into storyboards and edit clips, captions and audio on a visual multi-track timeline.</p><span class="more">Learn more →</span></article>
+        <article class="card reveal" data-info="visuals"><div class="thumb"><img src="https://p16-seeyou-sg.ibyteimg.com/tos-alisg-i-2zwwjm3azk-sg/afefc40d213c4c33b5d2bcc26a5cdaba~tplv-2zwwjm3azk-compress:q75.webp" alt="Grid of AI generated artwork" loading="lazy"></div><h3>AI visual suggestions</h3><p>Get on-brand images, characters and scenes suggested automatically for every piece of content.</p><span class="more">Learn more →</span></article>
+        <article class="card reveal" data-info="voice"><div class="thumb"><img src="https://i.ytimg.com/vi/hHuTKZ77I04/maxresdefault.jpg" alt="Sound wave and microphone feeding a digital brain" loading="lazy"></div><h3>Brand voice memory</h3><p>Upload samples once. AI Studio keeps your tone, vocabulary and rules across every project.</p><span class="more">Learn more →</span></article>
+        <article class="card reveal" data-info="quality"><div class="thumb"><img src="https://pub-2e17f120c9d046379c63e619f169fd4f.r2.dev/catalog/general/2026/06/e-ticaret-1782419643327-35cc7886ca.png" alt="Analytics dashboard with quality gauge" loading="lazy"></div><h3>Quality scoring</h3><p>Every draft gets a quality score for clarity, engagement and SEO, plus one-click improvements.</p><span class="more">Learn more →</span></article>
+        <article class="card reveal" data-info="publish"><div class="thumb"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDaw513TtQyUJiq87Amy43NG-LCv_W1aNNr4DHNzwwgYhTBxVU" alt="Central hub connected to publishing channels" loading="lazy"></div><h3>Publish anywhere</h3><p>Schedule and publish to social channels, your CMS and email tools without leaving the studio.</p><span class="more">Learn more →</span></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">How it works</span>
+        <h2>From idea to published in <span class="grad">four steps</span></h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal" data-info="step-describe"><h3>Describe</h3><p>Enter a topic, audience and goal — or paste a URL to repurpose.</p></div>
+        <div class="step reveal" data-info="step-generate"><h3>Generate</h3><p>AI drafts multiple versions in your brand voice within seconds.</p></div>
+        <div class="step reveal" data-info="step-refine"><h3>Refine</h3><p>Edit on the timeline, adjust tone and apply AI suggestions.</p></div>
+        <div class="step reveal" data-info="step-publish"><h3>Publish</h3><p>Schedule everywhere and track performance from one dashboard.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="templates">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Templates</span>
+        <h2>Start from <span class="grad">proven formats</span></h2>
+        <p>Over 120 templates for every channel and campaign type.</p>
+      </div>
+      <div class="gallery">
+        <div class="tile wide reveal" data-info="tpl-blog"><img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcS5cf7RPRkk-EoTs2pl4KRwDo_tlV4-Y0sFC4W9LKwXIh8wgZff" alt="Laptop showing a blog article layout" loading="lazy"><h3>Long-form SEO blog</h3><span>Outline, draft and meta tags</span></div>
+        <div class="tile reveal" data-info="tpl-social"><img src="https://img.magnific.com/free-vector/instagram-carousel-templates_52683-51656.jpg?semt=ais_hybrid&w=740&q=80" alt="Phone showing a social media carousel" loading="lazy"><h3>Instagram carousel</h3><span>Hook, slides, CTA</span></div>
+        <div class="tile reveal" data-info="tpl-email"><img src="https://resources.americaneagle.com/aecom-blobs/images/default-source/blog-images/why-you-should-track-your-email-marketing-campaigns.jpg?sfvrsn=ad8ba570_1" alt="Glowing envelope with message cards" loading="lazy"><h3>Email sequence</h3><span>Welcome &amp; nurture</span></div>
+        <div class="tile reveal" data-info="tpl-ads"><img src="https://img.magnific.com/premium-psd/billboard-neon-style-underground-subway-wall-mockup_80983-6434.jpg" alt="Digital billboard ad banners" loading="lazy"><h3>Ad variations</h3><span>Google &amp; Meta</span></div>
+        <div class="tile wide reveal" data-info="tpl-video"><img src="https://loopdesk.ai/_next/image?url=/images/blog/short-form-vs-long-form-video.jpg&w=2560&q=75&dpl=dpl_BJBQfrJjag2aSU5xG7V1mWKTvRtq" alt="Phone filming setup with storyboard frames" loading="lazy"><h3>Short-form video script</h3><span>TikTok, Reels, Shorts</span></div>
+        <div class="tile reveal" data-info="tpl-product"><img src="https://m.media-amazon.com/images/I/61fA3UG8LfL._AC_UY1000_.jpg" alt="Smart bottle and sneakers product shot" loading="lazy"><h3>Product description</h3><span>E-commerce ready</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="results">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Results</span>
+        <h2>Teams ship <span class="grad">more, in less time</span></h2>
+      </div>
+      <div class="grid-3">
+        <article class="card reveal" data-info="rev-aylin"><p class="quote">“We cut our weekly content production from three days to under one. The brand voice memory is uncanny.”</p><div class="who"><div class="avatar">AM</div><div>Aylin M.<small>Head of Marketing, Lumina</small></div></div></article>
+        <article class="card reveal" data-info="rev-daniel"><p class="quote">“Our output more than doubled without hiring. The quality score helps editors focus on what matters.”</p><div class="who"><div class="avatar">DK</div><div>Daniel K.<small>Content Lead, Northwind</small></div></div></article>
+        <article class="card reveal" data-info="rev-sara"><p class="quote">“From script to finished short video in one workspace. It changed how our small team works.”</p><div class="who"><div class="avatar">SR</div><div>Sara R.<small>Founder, Orbitly</small></div></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="container" style="text-align:center">
+      <div class="section-head reveal" style="margin-inline:auto">
+        <span class="eyebrow">Pricing</span>
+        <h2>Simple plans that <span class="grad">scale with you</span></h2>
+      </div>
+      <div class="billing reveal" role="group" aria-label="Billing period">
+        <button type="button" id="bMonthly" aria-pressed="true">Monthly</button>
+        <button type="button" id="bYearly" aria-pressed="false">Yearly −20%</button>
+      </div>
+      <div class="pricing" style="text-align:left">
+        <div class="plan reveal" data-info="plan-starter">
+          <h3>Starter</h3>
+          <div class="price">$<span data-m="0" data-y="0">0</span><small>/mo</small></div>
+          <p>For trying things out.</p>
+          <ul><li>20 generations / month</li><li>5 content types</li><li>Basic quality score</li></ul>
+          <button class="btn" type="button" data-action="start">Get started</button>
+        </div>
+        <div class="plan featured reveal" data-info="plan-pro">
+          <span class="tag">MOST POPULAR</span>
+          <h3>Pro</h3>
+          <div class="price">$<span data-m="29" data-y="23">29</span><small>/mo</small></div>
+          <p>For creators and growing teams.</p>
+          <ul><li>Unlimited generations</li><li>Brand voice memory</li><li>Video timeline editor</li><li>Scheduling &amp; publishing</li></ul>
+          <button class="btn primary" type="button" data-action="trial" data-plan="pro">Start free trial</button>
+        </div>
+        <div class="plan reveal" data-info="plan-business">
+          <h3>Business</h3>
+          <div class="price">$<span data-m="99" data-y="79">99</span><small>/mo</small></div>
+          <p>For agencies and large teams.</p>
+          <ul><li>Everything in Pro</li><li>10 team seats</li><li>API access</li><li>Priority support</li></ul>
+          <button class="btn" type="button" data-action="sales" data-plan="business">Contact sales</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <div class="section-head reveal" style="margin-inline:auto;text-align:center">
+        <span class="eyebrow">FAQ</span>
+        <h2>Questions? <span class="grad">Answers.</span></h2>
+      </div>
+      <div class="faq">
+        <details class="reveal" open><summary>Does the content sound like my brand?</summary><p>Yes. Upload a few samples and AI Studio learns your tone, vocabulary and style rules, then applies them to every draft.</p></details>
+        <details class="reveal"><summary>Can I edit what the AI generates?</summary><p>Absolutely. Everything is fully editable, and AI suggestions can be accepted or ignored with a single click.</p></details>
+        <details class="reveal"><summary>Which languages are supported?</summary><p>AI Studio can generate and translate content in over 30 languages, including English, Azerbaijani, Turkish and Russian.</p></details>
+        <details class="reveal"><summary>Is my data private?</summary><p>Your content and brand assets are never used to train public models and are encrypted in transit and at rest.</p></details>
+        <details class="reveal"><summary>Can I cancel anytime?</summary><p>Yes. Plans are month-to-month or yearly, and you can cancel from your dashboard at any time.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta" style="padding-top:20px">
+    <div class="container">
+      <div class="cta reveal">
+        <h2>Ready to <span class="grad">create 3× faster?</span></h2>
+        <p>Join the waitlist and get early access plus 100 free credits.</p>
+        <form id="ctaForm" novalidate>
+          <input type="email" id="ctaEmail" placeholder="you@company.com" aria-label="Email address" required>
+          <button class="btn primary" type="submit">Get early access</button>
+        </form>
+        <div class="form-msg" id="formMsg" role="status"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container foot">
+    <span>© 2026 NOVA333X · AI Studio. All rights reserved.</span>
+    <nav aria-label="Footer"><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></nav>
+    <div class="socials" aria-label="Social profiles">
+      <a href="https://www.upwork.com" target="_blank" rel="noopener noreferrer" aria-label="Upwork profile" title="Upwork"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.3 7.1c-1.95 0-3.42 1.22-4.18 3.12-.78-1.16-1.38-2.45-1.75-3.9H8.55v5.02c0 1.08-.88 1.96-1.96 1.96s-1.96-.88-1.96-1.96V6.32H1.95v5.02a4.64 4.64 0 0 0 8.98 1.62c.6.82 1.28 1.58 2.06 2.22l-1.4 6.5h2.75l1.07-4.95c.59.19 1.2.29 1.83.29 2.74 0 4.82-2.03 4.82-4.83 0-2.92-2.04-5.09-4.76-5.09Zm-.02 7.5c-.56 0-1.1-.14-1.62-.42l.48-2.23c.33-1.53.85-2.34 1.68-2.34.95 0 1.58 1 1.58 2.5 0 1.5-.83 2.49-2.12 2.49Z"/></svg></a>
+      <a href="https://github.com/yusufiexweb" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .9a11.2 11.2 0 0 0-3.54 21.83c.56.1.76-.24.76-.54v-2.1c-3.1.68-3.76-1.32-3.76-1.32-.5-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 .1.76.09 2.45 1.56.9.15 1.85-.1 2.45-.37.1-.72.4-1.2.72-1.48-2.48-.28-5.08-1.24-5.08-5.52 0-1.22.44-2.97.1-2.97 0 0 .95-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.13-1.45 3.08-1.15 3.08-1.15.6 1.54.22 2.69.1 2.97.72.78 1.16 1.78 1.16 3 0 4.3-2.6 5.23-5.1 5.5.4.35.76 1.03.76 2.08v3.08c0 .3.2.65.77.54A11.2 11.2 0 0 0 12 .9Z"/></svg></a>
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile" title="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 3.4a2.1 2.1 0 1 1 0 4.2 2.1 2.1 0 0 1 0-4.2ZM3.4 9h3.7v11.6H3.4V9Zm5.9 0h3.5v1.6h.05A3.85 3.85 0 0 1 16.3 8.7c3.8 0 4.5 2.5 4.5 5.7v6.2h-3.7v-5.5c0-1.3-.02-3-1.85-3-1.85 0-2.13 1.45-2.13 2.9v5.6H9.3V9Z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<dialog class="modal sm" id="leadModal" aria-labelledby="lTitle">
+  <button class="modal-close" id="lClose" type="button" aria-label="Close">✕</button>
+  <div class="modal-content">
+    <form id="leadForm" novalidate>
+      <span class="eyebrow" id="lEyebrow">Free trial</span>
+      <h3 id="lTitle">Start your free trial</h3>
+      <p id="lText">14 days of Pro, no credit card required.</p>
+      <div class="modal-form">
+        <div class="field"><label for="lName">Full name</label><input id="lName" type="text" maxlength="60" autocomplete="name" placeholder="Your name"></div>
+        <div class="field"><label for="lEmail">Work email</label><input id="lEmail" type="email" maxlength="100" autocomplete="email" placeholder="you@company.com"></div>
+        <div class="field"><label for="lPlan">Plan</label>
+          <select id="lPlan"><option value="starter">Starter — free</option><option value="pro">Pro</option><option value="business">Business</option></select>
+        </div>
+        <div class="field" id="lMsgWrap" hidden><label for="lMsg">How can we help?</label><textarea id="lMsg" maxlength="500" placeholder="Tell us about your team and needs"></textarea></div>
+        <div class="form-error" id="lError" role="alert"></div>
+      </div>
+      <div class="modal-actions"><button class="btn primary" type="submit" id="lSubmit">Start free trial</button><button class="btn" type="button" id="lCancel">Cancel</button></div>
+    </form>
+    <div id="lDone" hidden>
+      <div class="done-ico" aria-hidden="true">✓</div>
+      <h3 id="lDoneTitle"></h3>
+      <p id="lDoneText"></p>
+      <div class="modal-actions"><button class="btn primary" type="button" data-action="start" id="lDoneGo">Open the generator</button><button class="btn" type="button" id="lDoneClose">Close</button></div>
+    </div>
+  </div>
+</dialog>
+
+<button class="to-top" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+<dialog class="modal" id="infoModal" aria-labelledby="mTitle">
+  <button class="modal-close" id="mClose" type="button" aria-label="Close">✕</button>
+  <div class="modal-media" id="mMedia"><img id="mImg" alt=""></div>
+  <div class="modal-content">
+    <span class="eyebrow" id="mEyebrow"></span>
+    <h3 id="mTitle"></h3>
+    <p id="mText"></p>
+    <ul id="mList"></ul>
+    <div class="modal-actions" id="mActions"></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Safe storage helpers
+  const store = {
+    get(key, fallback) { try { return JSON.parse(localStorage.getItem('nova333x.' + key)) ?? fallback; } catch { return fallback; } },
+    set(key, value) { try { localStorage.setItem('nova333x.' + key, JSON.stringify(value)); } catch {} }
+  };
+  const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+
+  const goTo = sel => {
+    const el = $(sel);
+    if (el) el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  };
+  const flash = el => { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); };
+
+  // Mobile menu
+  const menuBtn = $('#menuBtn'), navLinks = $('#navLinks');
+  const closeMenu = () => { navLinks.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); menuBtn.textContent = '☰'; };
+  menuBtn.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.textContent = open ? '✕' : '☰';
+  });
+  navLinks.addEventListener('click', e => { if (e.target.closest('a, button')) closeMenu(); });
+  document.addEventListener('click', e => { if (!e.target.closest('.nav')) closeMenu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+  // Scroll spy, back-to-top
+  const spyLinks = $$('.nav-links a[href^="#"]');
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) spyLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  spyLinks.forEach(a => { const s = $(a.getAttribute('href')); if (s) spy.observe(s); });
+  const toTop = $('#toTop');
+  addEventListener('scroll', () => toTop.classList.toggle('show', scrollY > 700), { passive: true });
+  toTop.addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+
+  // FAQ: one open at a time
+  $$('.faq details').forEach(d => d.addEventListener('toggle', () => {
+    if (d.open) $$('.faq details').forEach(o => { if (o !== d) o.open = false; });
+  }));
+
+  // Toast
+  let toastTimer;
+  const toast = msg => {
+    const t = $('#toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  };
+
+  // Reveal on scroll + counters
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, { threshold: .12 }) : null;
+  $$('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+
+  const startCounters = () => $$('[data-count]').forEach(el => {
+    const target = +el.dataset.count;
+    if (reduceMotion) { el.textContent = target; return; }
+    const start = performance.now(), dur = 1400;
+    const tick = now => {
+      const p = Math.min((now - start) / dur, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+
+  // Preloader
+  (() => {
+    const pl = $('#preloader');
+    const bar = $('#plBar'), pct = $('#plPct'), status = $('#plStatus');
+    const msgs = ['Warming up AI models…', 'Loading brand voice…', 'Composing templates…', 'Rendering the studio…', 'Ready to create'];
+    const t0 = performance.now();
+    let p = 0, loaded = document.readyState === 'complete', finished = false;
+    document.body.style.overflow = 'hidden';
+    addEventListener('load', () => { loaded = true; });
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      clearInterval(timer);
+      bar.style.width = '100%'; pct.textContent = '100%'; status.textContent = msgs[4];
+      setTimeout(() => {
+        pl.classList.add('pl-done');
+        document.body.style.overflow = '';
+        startCounters();
+        setTimeout(() => pl.remove(), 800);
+      }, reduceMotion ? 0 : 350);
+    };
+    const timer = setInterval(() => {
+      const elapsed = performance.now() - t0;
+      const ready = (loaded && elapsed > (reduceMotion ? 200 : 1800)) || elapsed > 5000;
+      p = ready ? 100 : Math.min(p + 1 + Math.random() * 4, 92);
+      bar.style.width = p + '%';
+      pct.textContent = Math.floor(p) + '%';
+      status.textContent = msgs[Math.min(Math.floor(p / 25), 3)];
+      if (p >= 100) finish();
+    }, 45);
+  })();
+
+  // Pricing toggle
+  const billing = { yearly: false };
+  const setBilling = yearly => {
+    billing.yearly = yearly;
+    $('#bMonthly').setAttribute('aria-pressed', !yearly);
+    $('#bYearly').setAttribute('aria-pressed', yearly);
+    $$('.price [data-m]').forEach(el => el.textContent = yearly ? el.dataset.y : el.dataset.m);
+    toast(yearly ? 'Yearly billing — you save 20%' : 'Monthly billing');
+  };
+  $('#bMonthly').addEventListener('click', () => { if (billing.yearly) setBilling(false); });
+  $('#bYearly').addEventListener('click', () => { if (!billing.yearly) setBilling(true); });
+
+  // Waitlist form
+  $('#ctaForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const input = $('#ctaEmail'), msg = $('#formMsg'), btn = $('button', e.currentTarget);
+    const email = input.value.trim().toLowerCase();
+    if (!validEmail(email)) {
+      msg.style.color = '#ff8a9b';
+      msg.textContent = 'Please enter a valid email address.';
+      input.focus();
+      return;
+    }
+    const list = store.get('waitlist', []);
+    msg.style.color = '';
+    if (list.includes(email)) {
+      msg.textContent = `You're already on the list (#${list.indexOf(email) + 1}). We'll be in touch soon.`;
+      return;
+    }
+    list.push(email);
+    store.set('waitlist', list);
+    msg.textContent = `You're on the list! Your position: #${list.length}. We'll email you soon.`;
+    btn.textContent = 'Joined ✓';
+    input.value = '';
+    setTimeout(() => { btn.textContent = 'Get early access'; }, 3000);
+  });
+
+  // ---- Info modal ----
+  const CTA_STUDIO = { label: 'Try it in the generator', action: 'start' };
+  const INFO = {
+    hero: { tag: 'Overview', title: 'AI Studio at a glance', text: 'AI Studio combines a timeline editor, an AI suggestions panel and a text generator in one workspace, so a single person can plan, create and publish content like a full team.', points: ['Timeline editor for clips, captions and audio', 'AI suggestions panel for images, characters and scenes', 'One-click generation of text in your brand voice'], cta: CTA_STUDIO },
+    'stat-time': { tag: 'Result', title: '75% of time saved', text: 'Teams using AI Studio spend far less time on first drafts, formatting and repurposing, and more time on strategy and creativity.', points: ['Drafts ready in seconds instead of hours', 'Automatic reformatting for every channel', 'Fewer review rounds thanks to brand voice memory'], cta: CTA_STUDIO },
+    'stat-output': { tag: 'Result', title: '+200% content output', text: 'With faster production, the same team ships more than twice as much content without extra headcount or longer working hours.', points: ['Turn one idea into blog, social, email and video', 'Batch-generate variations for A/B testing', 'Reusable templates for recurring campaigns'], cta: CTA_STUDIO },
+    'stat-quality': { tag: 'Result', title: '92% average quality score', text: 'Every draft is scored for clarity, engagement and SEO. The score highlights weak spots and suggests one-click improvements.', points: ['Clarity and readability checks', 'Engagement and tone analysis', 'SEO keyword and structure suggestions'], cta: CTA_STUDIO },
+
+    text: { tag: 'Feature', title: 'Smart text generation', text: 'Describe your topic and audience and AI Studio drafts long-form articles, captions, ads and emails with a consistent structure and style.', points: ['5 content types: blog, social, ad, video script, email', '4 tones of voice, from professional to luxury', 'Instant regeneration for fresh variations'], cta: CTA_STUDIO },
+    video: { tag: 'Feature', title: 'Timeline video editor', text: 'Turn scripts into storyboards and fine-tune clips, captions and audio on a visual multi-track timeline right in the browser.', points: ['Multi-track video and audio timeline', 'Auto-generated captions', 'Script-to-storyboard conversion'], cta: { label: 'See the workflow', href: '#how' } },
+    visuals: { tag: 'Feature', title: 'AI visual suggestions', text: 'The AI suggests on-brand images, characters and scenes for every piece of content, so visuals are never an afterthought.', points: ['Style-consistent artwork across campaigns', 'Character and scene variations in one click', 'Mood and palette matched to your brand'], cta: { label: 'Browse templates', href: '#templates' } },
+    voice: { tag: 'Feature', title: 'Brand voice memory', text: 'Upload samples of your writing once. AI Studio remembers your tone, vocabulary and rules and applies them to every project.', points: ['Learns from your existing content', 'Custom do and don\'t word lists', 'Shared voice across the whole team'], cta: CTA_STUDIO },
+    quality: { tag: 'Feature', title: 'Quality scoring', text: 'Each draft receives a quality score covering clarity, engagement and SEO, along with concrete suggestions to improve it.', points: ['Live score updates as you edit', 'One-click improvement suggestions', 'Track quality trends over time'], cta: CTA_STUDIO },
+    publish: { tag: 'Feature', title: 'Publish anywhere', text: 'Schedule and publish to social channels, your CMS and email tools without leaving the studio, and track results in one dashboard.', points: ['Content calendar with scheduling', 'Direct publishing to social, CMS and email', 'Unified performance dashboard'], cta: { label: 'View pricing', href: '#pricing' } },
+
+    'step-describe': { tag: 'Step 1', title: 'Describe', text: 'Start by telling AI Studio what you need: a topic, target audience and goal. You can also paste a URL or document to repurpose existing content.', points: ['Topic, audience and goal', 'Paste a URL to repurpose', 'Pick a template to start faster'], cta: CTA_STUDIO },
+    'step-generate': { tag: 'Step 2', title: 'Generate', text: 'AI drafts several versions in your brand voice within seconds, so you can pick the strongest starting point.', points: ['Multiple variations per request', 'Brand voice applied automatically', 'Quality score shown for each draft'], cta: CTA_STUDIO },
+    'step-refine': { tag: 'Step 3', title: 'Refine', text: 'Edit text directly, adjust the tone, rearrange clips on the timeline and accept or ignore AI suggestions with one click.', points: ['Inline editing with AI assist', 'Tone and length controls', 'Visual timeline for video'], cta: { label: 'Explore features', href: '#features' } },
+    'step-publish': { tag: 'Step 4', title: 'Publish', text: 'Schedule content across all channels at once and follow performance from a single dashboard.', points: ['Multi-channel scheduling', 'Performance analytics', 'Team approvals before publishing'], cta: { label: 'View pricing', href: '#pricing' } },
+
+    'tpl-blog': { tag: 'Template', title: 'Long-form SEO blog', text: 'A complete article workflow: keyword-focused outline, full draft, headings and meta description ready for your CMS.', points: ['Outline, intro, sections and conclusion', 'Meta title and description', 'Internal linking suggestions'], cta: CTA_STUDIO },
+    'tpl-social': { tag: 'Template', title: 'Instagram carousel', text: 'Hook-driven carousel copy with slide-by-slide text, a strong call to action and relevant hashtags.', points: ['Scroll-stopping first slide', '5 to 8 slide structure', 'Hashtag and caption set'], cta: CTA_STUDIO },
+    'tpl-email': { tag: 'Template', title: 'Email sequence', text: 'Welcome and nurture sequences with subject lines, preview text and personalised body copy.', points: ['Subject line variations', 'Personalisation tokens', 'Clear single call to action'], cta: CTA_STUDIO },
+    'tpl-ads': { tag: 'Template', title: 'Ad variations', text: 'Generate multiple headlines and descriptions for Google and Meta ads, ready to test side by side.', points: ['3 headlines and 2 descriptions per set', 'Character limits respected', 'Built for A/B testing'], cta: CTA_STUDIO },
+    'tpl-video': { tag: 'Template', title: 'Short-form video script', text: 'Timed scripts for TikTok, Reels and Shorts with hook, problem, solution and call to action, plus on-screen text.', points: ['Second-by-second structure', 'Voice-over and on-screen text', '9:16 vertical format'], cta: CTA_STUDIO },
+    'tpl-product': { tag: 'Template', title: 'Product description', text: 'E-commerce descriptions that highlight benefits, answer objections and stay consistent across your catalogue.', points: ['Benefit-led copy', 'Short and long versions', 'Bulk generation for catalogues'], cta: CTA_STUDIO },
+
+    'rev-aylin': { tag: 'Customer story', title: 'Lumina: 3 days down to 1', text: 'Aylin M., Head of Marketing at Lumina, reduced weekly content production from three days to under one by using brand voice memory and templates.', points: ['Weekly production time cut by about 66%', 'Consistent voice across 4 writers', 'Faster approvals'], cta: { label: 'View pricing', href: '#pricing' } },
+    'rev-daniel': { tag: 'Customer story', title: 'Northwind: output doubled', text: 'Daniel K., Content Lead at Northwind, more than doubled content output without hiring, using the quality score to focus editorial time.', points: ['2x content output', 'Editors focus on high-impact pieces', 'No additional headcount'], cta: { label: 'View pricing', href: '#pricing' } },
+    'rev-sara': { tag: 'Customer story', title: 'Orbitly: scripts to video', text: 'Sara R., Founder of Orbitly, moves from script to finished short video in a single workspace with the timeline editor.', points: ['One tool instead of four', 'Short videos produced in hours', 'Small team, big output'], cta: { label: 'Explore features', href: '#features' } },
+
+    'plan-starter': { tag: 'Plan', title: 'Starter — free', text: 'The best way to explore AI Studio. Generate content and see the quality score without entering a card.', points: ['20 generations per month', '5 content types', 'Basic quality score'], cta: CTA_STUDIO },
+    'plan-pro': { tag: 'Most popular', title: 'Pro — $29/mo ($23 yearly)', text: 'Everything creators and growing teams need to produce content at scale, with brand voice memory and publishing included.', points: ['Unlimited generations', 'Brand voice memory', 'Video timeline editor', 'Scheduling and publishing'], cta: { label: 'Start free trial', action: 'trial', plan: 'pro' } },
+    'plan-business': { tag: 'Plan', title: 'Business — $99/mo ($79 yearly)', text: 'Built for agencies and larger teams that need collaboration, integrations and priority support.', points: ['Everything in Pro', '10 team seats', 'API access', 'Priority support'], cta: { label: 'Contact sales', action: 'sales', plan: 'business' } }
+  };
+
+  const modal = $('#infoModal');
+  const syncLock = () => { document.documentElement.style.overflow = $('dialog[open]') ? 'hidden' : ''; };
+  const openInfo = el => {
+    const d = INFO[el.dataset.info];
+    if (!d) return;
+    const img = el.matches('img') ? el : $('img', el);
+    const media = $('#mMedia');
+    media.hidden = !img;
+    if (img) { $('#mImg', modal).src = img.currentSrc || img.src; $('#mImg', modal).alt = img.alt; }
+    $('#mEyebrow').textContent = d.tag;
+    $('#mTitle').textContent = d.title;
+    $('#mText').textContent = d.text;
+    const list = $('#mList');
+    list.replaceChildren(...d.points.map(p => Object.assign(document.createElement('li'), { textContent: p })));
+
+    const mk = (tag, props) => Object.assign(document.createElement(tag), props);
+    const cta = d.cta.action
+      ? mk('button', { className: 'btn primary', type: 'button', textContent: d.cta.label })
+      : mk('a', { className: 'btn primary', href: d.cta.href, textContent: d.cta.label });
+    if (d.cta.action) { cta.dataset.action = d.cta.action; if (d.cta.plan) cta.dataset.plan = d.cta.plan; }
+    cta.addEventListener('click', () => modal.close());
+    const close = mk('button', { className: 'btn', type: 'button', textContent: 'Close' });
+    close.addEventListener('click', () => modal.close());
+    const actions = $('#mActions');
+    actions.replaceChildren(cta, close);
+
+    const group = $$(':scope > [data-info]', el.parentElement);
+    if (group.length > 1) {
+      const i = group.indexOf(el);
+      const step = dir => openInfo(group[(i + dir + group.length) % group.length]);
+      const prev = mk('button', { className: 'btn', type: 'button', textContent: '‹ Prev', title: 'Previous (←)' });
+      const next = mk('button', { className: 'btn', type: 'button', textContent: 'Next ›', title: 'Next (→)' });
+      prev.addEventListener('click', () => step(-1));
+      next.addEventListener('click', () => step(1));
+      const nav = mk('div', { className: 'modal-nav' });
+      nav.append(prev, next);
+      actions.append(nav);
+      modal._step = step;
+    } else {
+      modal._step = null;
+    }
+
+    modal.scrollTop = 0;
+    if (!modal.open) modal.showModal();
+    syncLock();
+  };
+
+  $$('[data-info]').forEach(el => {
+    el.setAttribute('role', 'button');
+    el.tabIndex = 0;
+    el.setAttribute('aria-haspopup', 'dialog');
+    el.addEventListener('click', e => { if (!e.target.closest('a, button')) openInfo(el); });
+    el.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target === el) { e.preventDefault(); openInfo(el); }
+    });
+  });
+  $('#mClose').addEventListener('click', () => modal.close());
+  modal.addEventListener('click', e => { if (e.target === modal) modal.close(); });
+  modal.addEventListener('keydown', e => {
+    if (!modal._step || e.target.closest('input, textarea, select')) return;
+    if (e.key === 'ArrowRight') modal._step(1);
+    if (e.key === 'ArrowLeft') modal._step(-1);
+  });
+  modal.addEventListener('close', syncLock);
+
+  // ---- Lead dialog (free trial / contact sales) ----
+  const lead = $('#leadModal');
+  const leadModes = {
+    trial: { eyebrow: 'Free trial', title: 'Start your free trial', text: '14 days of Pro, no credit card required.', submit: 'Start free trial', done: 'Your trial is ready' },
+    sales: { eyebrow: 'Contact sales', title: 'Talk to our team', text: 'Tell us about your needs and we\'ll reply within one business day.', submit: 'Send request', done: 'Request sent' }
+  };
+  let leadMode = 'trial';
+  const user = () => store.get('user', null);
+  const updateNav = () => {
+    const u = user();
+    const label = u ? `Hi, ${u.name.split(' ')[0]}` : 'Try it free';
+    $('#navCta').textContent = label;
+    $('#navCta').dataset.action = u ? 'start' : 'trial';
+    $('.nav-mobile-cta').textContent = u ? 'Open the generator' : 'Try it free';
+    $('.nav-mobile-cta').dataset.action = u ? 'start' : 'trial';
+  };
+  const openLead = (mode, plan) => {
+    leadMode = mode;
+    const m = leadModes[mode];
+    $('#lEyebrow').textContent = m.eyebrow;
+    $('#lTitle').textContent = m.title;
+    $('#lText').textContent = m.text;
+    $('#lSubmit').textContent = m.submit;
+    $('#lMsgWrap').hidden = mode !== 'sales';
+    $('#lPlan').value = plan || (mode === 'sales' ? 'business' : 'pro');
+    const u = user();
+    $('#lName').value = u ? u.name : $('#lName').value;
+    $('#lEmail').value = u ? u.email : $('#lEmail').value;
+    $('#lError').textContent = '';
+    $('#leadForm').hidden = false;
+    $('#lDone').hidden = true;
+    if (!lead.open) lead.showModal();
+    syncLock();
+    $('#lName').focus();
+  };
+  $('#lClose').addEventListener('click', () => lead.close());
+  $('#lCancel').addEventListener('click', () => lead.close());
+  $('#lDoneClose').addEventListener('click', () => lead.close());
+  $('#lDoneGo').addEventListener('click', () => lead.close());
+  lead.addEventListener('click', e => { if (e.target === lead) lead.close(); });
+  lead.addEventListener('close', syncLock);
+  $('#leadForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('#lName').value.trim(), email = $('#lEmail').value.trim().toLowerCase();
+    const err = $('#lError');
+    if (name.length < 2) { err.textContent = 'Please enter your name.'; $('#lName').focus(); return; }
+    if (!validEmail(email)) { err.textContent = 'Please enter a valid email address.'; $('#lEmail').focus(); return; }
+    const plan = $('#lPlan').value;
+    const leads = store.get('leads', []);
+    leads.push({ type: leadMode, name, email, plan, billing: billing.yearly ? 'yearly' : 'monthly', message: $('#lMsg').value.trim(), at: new Date().toISOString() });
+    store.set('leads', leads);
+    const planName = plan.charAt(0).toUpperCase() + plan.slice(1);
+    if (leadMode === 'trial') {
+      store.set('user', { name, email, plan });
+      updateNav();
+      $('#lDoneTitle').textContent = `Welcome, ${name.split(' ')[0]}!`;
+      $('#lDoneText').textContent = `Your ${planName} trial is active. Try the generator now — we sent the details to ${email}.`;
+      $('#lDoneGo').hidden = false;
+    } else {
+      $('#lDoneTitle').textContent = 'Request sent';
+      $('#lDoneText').textContent = `Thanks, ${name.split(' ')[0]}! Our team will contact you at ${email} within one business day.`;
+      $('#lDoneGo').hidden = true;
+    }
+    $('#leadForm').hidden = true;
+    $('#lDone').hidden = false;
+  });
+  updateNav();
+
+  // ---- Central button actions ----
+  const focusGenerator = () => {
+    goTo('#studio');
+    setTimeout(() => { $('#topic').focus({ preventScroll: true }); flash($('.studio')); }, reduceMotion ? 0 : 600);
+  };
+  const actions = {
+    start: focusGenerator,
+    trial: btn => openLead('trial', btn.dataset.plan),
+    sales: btn => openLead('sales', btn.dataset.plan),
+    how: () => {
+      goTo('#how');
+      $$('.step').forEach((s, i) => setTimeout(() => flash(s), (reduceMotion ? 0 : 500) + i * 220));
+    }
+  };
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn || btn.disabled) return;
+    const fn = actions[btn.dataset.action];
+    if (fn) { e.preventDefault(); fn(btn); }
+  });
+
+  // ---- Content generator (client-side templates) ----
+  const titles = { blog: 'Blog post', social: 'Social post', ad: 'Ad copy', video: 'Video script', email: 'Email' };
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+  const tones = {
+    professional: {
+      open: ['In today\'s competitive landscape', 'As expectations continue to evolve', 'For organizations focused on results'],
+      adj: ['reliable', 'efficient', 'proven', 'scalable'],
+      cta: ['Discover how it can work for you.', 'Request a demo today.', 'Take the next step with confidence.'],
+      tags: ['#Innovation', '#Strategy', '#Growth']
+    },
+    friendly: {
+      open: ['Let\'s be honest', 'Here\'s a little secret', 'Good news, friends'],
+      adj: ['simple', 'delightful', 'easy-going', 'handy'],
+      cta: ['Give it a try — you\'ll love it!', 'Jump in and see for yourself 😊', 'We can\'t wait to hear what you think!'],
+      tags: ['#MadeEasy', '#Community', '#LoveIt']
+    },
+    bold: {
+      open: ['Stop settling', 'Forget everything you knew', 'The game just changed'],
+      adj: ['unstoppable', 'game-changing', 'fearless', 'next-level'],
+      cta: ['Make your move NOW.', 'Don\'t wait. Dominate.', 'Join the revolution today.'],
+      tags: ['#NextLevel', '#NoLimits', '#GameChanger']
+    },
+    luxury: {
+      open: ['Crafted for those who appreciate the exceptional', 'Where refinement meets purpose', 'Timeless by design'],
+      adj: ['exquisite', 'refined', 'bespoke', 'impeccable'],
+      cta: ['Experience the difference.', 'Reserve your private preview.', 'Discover the art of excellence.'],
+      tags: ['#Exclusive', '#Elegance', '#Craftsmanship']
+    }
+  };
+
+  const builders = {
+    blog: (t, a, k) => `# ${cap(t)}: A ${pick(k.adj)} approach for ${a}
+
+${pick(k.open)}, ${t} is becoming one of the most talked-about topics for ${a}. Here is what you need to know.
+
+## 1. Why ${t} matters now
+${cap(t)} helps ${a} save time, reduce friction and focus on the work that really counts. Teams that adopt it early report faster results and happier customers.
+
+## 2. Three ways to get started
+• Define a clear goal and measure it from day one.
+• Choose a ${pick(k.adj)} solution that fits your existing workflow.
+• Iterate weekly using real feedback instead of assumptions.
+
+## 3. Common mistakes to avoid
+Trying to do everything at once, ignoring your audience's real needs, and skipping measurement are the three fastest ways to stall progress.
+
+## Final thoughts
+${cap(t)} is not just a trend — it's a lasting shift in how ${a} work and decide. ${pick(k.cta)}`,
+
+    social: (t, a, k) => `${pick(k.open)} — ${t} is changing the game for ${a}. ✨
+
+✔ ${cap(pick(k.adj))} from day one
+✔ Built around what ${a} actually need
+✔ Results you can see in days, not months
+
+${pick(k.cta)}
+
+${k.tags.join(' ')} #${t.replace(/[^a-z0-9]+/gi, '').slice(0, 20) || 'AIStudio'}`,
+
+    ad: (t, a, k) => `HEADLINE A: ${cap(t)} — ${cap(pick(k.adj))} Results for ${a}
+HEADLINE B: ${pick(k.open)}. Meet ${t}.
+HEADLINE C: Why ${a} are switching to ${t}
+
+DESCRIPTION 1: ${cap(pick(k.adj))}, effortless and designed for ${a}. ${pick(k.cta)}
+DESCRIPTION 2: Join thousands who already made the switch to ${t}. Satisfaction guaranteed.
+
+CALL TO ACTION: ${pick(['Shop now', 'Learn more', 'Get started', 'Claim your offer'])}`,
+
+    video: (t, a, k) => `TITLE: ${cap(t)} in 30 seconds
+FORMAT: Vertical short (9:16) · Duration: ~30s
+
+[0:00–0:03] HOOK
+On-screen text: "${pick(k.open)}…"
+Voice-over: "If you're one of the ${a}, you need to see this."
+
+[0:03–0:12] PROBLEM
+Quick cuts of everyday frustration. Voice-over: "Doing this the old way costs time and energy."
+
+[0:12–0:24] SOLUTION
+Smooth product shots of ${t}. Voice-over: "Meet ${t} — ${pick(k.adj)}, fast and made for you."
+
+[0:24–0:30] CTA
+On-screen text: "${pick(k.cta)}"
+End card with logo and link in bio.`,
+
+    email: (t, a, k) => `SUBJECT: ${cap(pick(k.adj))} news about ${t} for ${a}
+PREVIEW: A quick note we think you'll appreciate.
+
+Hi {{first_name}},
+
+${pick(k.open)}. We've been working on ${t} with ${a} in mind, and we're excited to share it with you.
+
+Here's what you get:
+• A ${pick(k.adj)} experience from the first click
+• Real time savings every single week
+• Dedicated support whenever you need it
+
+${pick(k.cta)}
+
+[ Get started → ]
+
+Warm regards,
+The AI Studio Team`
+  };
+
+  const state = { type: 'blog', timer: null, think: null, text: '', busy: false };
+  const body = $('#outBody'), genBtn = $('#genBtn');
+  const outBtns = ['copyBtn', 'regenBtn', 'dlBtn', 'clearBtn'].map(id => $('#' + id));
+  const emptyMsg = 'Your generated content will appear here.\nFill in a topic and press “Generate content”.';
+  const MAX_HISTORY = 5;
+
+  const setType = type => {
+    state.type = type;
+    $$('#typeChips .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.type === type));
+  };
+
+  const setMeta = text => {
+    const words = (text.match(/\S+/g) || []).length;
+    $('#mWords').textContent = words;
+    $('#mRead').textContent = words ? Math.max(1, Math.round(words / 200)) + ' min' : '0 min';
+    $('#mScore').textContent = words ? (88 + Math.floor(Math.random() * 8)) + '%' : '—';
+  };
+
+  const setBusy = busy => {
+    state.busy = busy;
+    genBtn.setAttribute('aria-busy', busy);
+    if (busy) {
+      const sp = Object.assign(document.createElement('span'), { className: 'spinner' });
+      genBtn.replaceChildren(sp, document.createTextNode(' Generating… (click to skip)'));
+    } else {
+      genBtn.textContent = '✦ Generate content';
+    }
+  };
+
+  const stopTimers = () => { clearInterval(state.timer); clearTimeout(state.think); };
+
+  const showFinal = () => {
+    stopTimers();
+    body.classList.remove('empty', 'typing');
+    body.textContent = state.text;
+    body.scrollTop = 0;
+    setMeta(state.text);
+    outBtns.forEach(b => b.disabled = false);
+    setBusy(false);
+  };
+
+  // History of recent generations
+  const renderHistory = () => {
+    const items = store.get('history', []);
+    $('#history').hidden = !items.length;
+    $('#histList').replaceChildren(...items.map((h, i) => {
+      const b = Object.assign(document.createElement('button'), { type: 'button', className: 'h-item', textContent: `${titles[h.type]} · ${h.topic}`, title: 'Open this result' });
+      b.addEventListener('click', () => restore(i));
+      return b;
+    }));
+  };
+  const addHistory = entry => {
+    const items = store.get('history', []).filter(h => !(h.type === entry.type && h.topic === entry.topic && h.text === entry.text));
+    items.unshift(entry);
+    store.set('history', items.slice(0, MAX_HISTORY));
+    renderHistory();
+  };
+  const restore = i => {
+    const h = store.get('history', [])[i];
+    if (!h) return;
+    stopTimers();
+    setType(h.type);
+    $('#topic').value = h.topic;
+    $('#audience').value = h.audience || '';
+    $('#tone').value = h.tone || 'professional';
+    $('#outTitle').textContent = titles[h.type];
+    state.text = h.text;
+    showFinal();
+    toast('Restored from history');
+  };
+
+  // force = true restarts an in-progress generation; otherwise a click while busy skips the animation
+  const generate = (force = false) => {
+    if (state.busy && !force) { showFinal(); return; }
+    const topic = $('#topic').value.trim();
+    if (!topic) { $('#topic').focus(); flash($('#topic')); toast('Please enter a topic first'); return; }
+    const audience = $('#audience').value.trim() || 'modern teams';
+    const toneKey = $('#tone').value;
+    const text = builders[state.type](topic.toLowerCase(), audience.toLowerCase(), tones[toneKey]);
+
+    stopTimers();
+    state.text = text;
+    $('#outTitle').textContent = titles[state.type];
+    body.classList.remove('empty');
+    body.classList.add('typing');
+    body.textContent = 'Analysing your brief…';
+    setBusy(true);
+    outBtns.forEach(b => b.disabled = true);
+
+    const done = () => {
+      showFinal();
+      addHistory({ type: state.type, topic, audience: $('#audience').value.trim(), tone: toneKey, text });
+    };
+    state.think = setTimeout(() => {
+      if (reduceMotion) { done(); return; }
+      let i = 0;
+      body.textContent = '';
+      state.timer = setInterval(() => {
+        i = Math.min(i + 4, text.length);
+        body.textContent = text.slice(0, i);
+        body.scrollTop = body.scrollHeight;
+        if (i >= text.length) done();
+      }, 16);
+    }, reduceMotion ? 0 : 650);
+  };
+
+  const regenerateIfActive = () => { if (state.text && $('#topic').value.trim()) generate(true); };
+
+  $$('#typeChips .chip').forEach(chip => chip.addEventListener('click', () => {
+    if (state.type === chip.dataset.type) return;
+    setType(chip.dataset.type);
+    regenerateIfActive();
+  }));
+  $('#tone').addEventListener('change', regenerateIfActive);
+
+  // Quick examples
+  const examples = [
+    { label: 'Smart bottle post', type: 'social', topic: 'Eco-friendly smart water bottle', audience: 'busy young professionals', tone: 'friendly' },
+    { label: 'SaaS launch email', type: 'email', topic: 'AI project management app', audience: 'startup founders', tone: 'professional' },
+    { label: 'Luxury watch ad', type: 'ad', topic: 'Limited edition automatic watch', audience: 'collectors', tone: 'luxury' },
+    { label: 'Fitness reel script', type: 'video', topic: '15-minute home workout plan', audience: 'beginners', tone: 'bold' }
+  ];
+  $('#exChips').replaceChildren(...examples.map(ex => {
+    const b = Object.assign(document.createElement('button'), { type: 'button', className: 'chip ex', textContent: ex.label });
+    b.addEventListener('click', () => {
+      setType(ex.type);
+      $('#topic').value = ex.topic;
+      $('#audience').value = ex.audience;
+      $('#tone').value = ex.tone;
+      generate(true);
+    });
+    return b;
+  }));
+
+  $('#genForm').addEventListener('submit', e => { e.preventDefault(); generate(); });
+  $('#regenBtn').addEventListener('click', () => generate(true));
+  $('#clearBtn').addEventListener('click', () => {
+    stopTimers();
+    setBusy(false);
+    state.text = '';
+    body.classList.remove('typing');
+    body.classList.add('empty');
+    body.textContent = emptyMsg;
+    $('#outTitle').textContent = 'Output';
+    setMeta('');
+    outBtns.forEach(b => b.disabled = true);
+  });
+  $('#histClear').addEventListener('click', () => { store.set('history', []); renderHistory(); toast('History cleared'); });
+  $('#dlBtn').addEventListener('click', () => {
+    const slug = ($('#topic').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'content').slice(0, 40);
+    const url = URL.createObjectURL(new Blob([state.text], { type: 'text/plain;charset=utf-8' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: `${state.type}-${slug}.txt` });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('Download started');
+  });
+  $('#copyBtn').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(state.text);
+      toast('Copied to clipboard');
+    } catch {
+      const r = document.createRange(); r.selectNodeContents(body);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      toast('Press Ctrl+C to copy');
+    }
+  });
+  renderHistory();
+})();
+</script>
+</body>
+</html>
